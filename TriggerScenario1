@@ -1,0 +1,58 @@
+Scenario 1 with Test Class------>One Object
+
+Trigger Scenario
+• Upon Account record creation if Industry field is having
+value as 'Media' or 'Energy' then populate Rating as
+'Hot'.
+Create Trigger on Account
+Create TriggerHandler Class
+Create Test Class for Code Coverage
+
+
+Trigger AccountTrigger on Account(Before event){
+    AccountTriggerHandler.UpdateRating(Trigger.new);
+}
+
+Public class AccountTriggerHandler{
+
+ public static void UpdateRating(List<Account>accList)
+ {
+  for(Account acc:accList)
+  {
+     if(acc.Industry=='Media' || acc.Industry=='Energy')
+	 {
+	  acc.Rating='HOT';
+	 }
+  }
+ }
+
+
+}
+
+
+Test Class:75% Coverage We need
+
+@isTest
+Public Class AccountTriggerHandlerTest
+{
+@isTest
+  public static void UpdateRating(List<Account>accList)
+  {
+    List<Account>accList= new List<Account>();
+	
+	for(Integer i=1; i<=5; i++)
+	{
+	 Account acc= new Account();
+	 acc.name='Test'+i;
+	 acc.Industry='Media';
+	 accList.add(acc);
+	}
+	Test.startTest();
+	Insert accList;
+	Test.stopTest();
+	
+	List<Account>UpdateAccList=[select id,Rating from Account where Id =:accList[0].Id];
+	
+	system.assertEquals('HOT',UpdateAccList[0].Rating);
+  }
+}
