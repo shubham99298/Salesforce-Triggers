@@ -1,0 +1,62 @@
+Scenario 2--->
+Trigger Scenario
+• Upon Opportunity record creation if Amount is between
+100000 to 500000 then populate 'Hot Opportunity' in
+description field.
+Create Trigger on Opportunity
+Create TriggerHandler Class
+Create Test Class for Code Coverage
+
+
+Trigger OpportunityTrigger on Opportunity(before Insert)
+{
+  OpportunityTriggerHandler.UdpateDesc(Trigger.new);
+}
+
+
+Public Class OpportunityTriggerHandler{
+   public static void UdpateDesc(List<Opportunity>OppList){
+   
+      for(Opportunity Opp:OppList)
+	  {
+	    if(Opp.amount!=NULL && Opp.amount>=100000 && amount <=500000)
+		{
+		 Opp.description='Hot Opportunity';
+		}
+	  }
+   
+   }
+
+}
+
+
+@isTest
+
+Public class OpportunityTriggerHandler{
+ @isTest
+ public static UdpateDesc(){
+   
+   List<Opportunity>OppList= new List<Opportunity>();
+   
+    for(Integer i=0; i<=5; i++)
+	{
+	  Opportunity Opp= new Opportunity();
+	  Opp.name='Test'+i;
+	  Opp.stageName='Prospecting';
+	  Opp.closeDate=system.today();
+	  opp.amount=50000;
+	  OppList.add(Opp);
+	}
+	Test.StartTest();
+	Insert OppList;
+	Test.Stoptest();
+	
+	List<Opportunity>UpdateOpps=[select Id,Description from Opportunity where Id in=:OppList[0].Id];
+	
+	system.assertEquals('Hot Opportunity',UpdateOpps[0].description);
+	
+ }
+}
+
+
+
