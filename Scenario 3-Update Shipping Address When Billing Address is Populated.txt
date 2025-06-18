@@ -1,0 +1,58 @@
+Trigger Scenario
+• When an Account record is created and
+CopyBilling ToShipping checkbox is checked then copy
+Account Billing Address to Shipping Address.
+Create Trigger on Account
+Create TriggerHandler Class
+Create Test Class for Code Coverage
+
+
+Trigger AccountTrigger on Account(before Insert)
+{
+  AccountTriggerHandler.UpdateAddress(Trigger.new);
+}
+
+public class AccountTriggerHandler{
+  public static void UpdateAddress(List<Account>accList)
+  {
+    for(Account acc:accList)
+	{
+	  if(acc.CopyBillingtoShipping && acc.Billing!=NULL && acc.BillingCountry!=NULL )
+	  {
+	  //taking two fields for now
+	   acc.shippingcity=acc.Billingcity;
+	   acc.shippingcountry=acc.BillingCountry;
+	  }
+	}
+  
+  }
+}
+
+
+@isTest
+
+Public class AccountTriggerHandler{
+ @isTest 
+ public static void UpdateAddress()
+ {
+   List<Account>accList= new List <Account>();
+   
+   for(Integer i=1; i<=5; i++)
+   {
+     Account acc= new Account();
+	 acc.name='test'+i;
+	 acc.CopyBillingtoShipping=TRUE;
+	 acc.Billingcity='Jaipur';
+	 acc.BillingCountry='India';
+	 accList.add(acc);
+   }
+   Test.startTest();
+   Insert accList;
+   Test.stopTest();
+   
+   List<Account>UpdateAcc=[select id,ShippingCity from Account where Id=:UpdateAcc[0].Id];
+   
+   
+   system.assertEquals('Jaipur',UpdateAcc[0].Billingcity);
+ }
+}
