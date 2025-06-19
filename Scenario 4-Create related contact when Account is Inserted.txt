@@ -1,0 +1,59 @@
+Trigger Scenario
+• When an Account record is created then Create
+related Contact as well.
+Create Trigger on Account
+Create TriggerHandler Class
+Create Test Class for Code Coverage
+
+
+Trigger AccountTrigger on Account(After Insert)
+{
+ AccountTriggerHandler.CreateRelatedContact(Trigger.new);
+}
+
+Public class AccountTriggerHandler{
+ public static void CreateRelatedContact(List<Account>accList)
+ {
+   List<contact>conList= new List<contact>();
+   for(Account acc:accList)
+   {
+     Contact con= new contact();
+	 con.LastName=acc.Name;
+	 con.accountId=acc.Id;
+	 conList.add(con);
+   }
+    if(!conList.isempty())
+	{
+	 Insert conList;
+	}
+ }
+}
+
+Test Class
+@isTest
+public Class AccountTriggerHandler{
+ @isTest 
+ public static void CreateRelatedContact
+ { 
+    List<Account>accList= new List<Account>();
+	
+	for(Integer i=0; i<=5; i++)
+	{
+	 Account acc= new Account();
+	 acc.name='test'+i;
+	 accList.add(acc);
+	 
+	}
+	Test.StartTest();
+	Insert accList;
+	Test.Stoptest();
+	
+	
+	List<contact>conList= [select id from contact where AccountId =:accList[0].Id];'
+	
+	system.asserEquals(ConList!=NULL , 'contact is created');
+	//system.assertEquals(6,conList.size());
+	
+	
+ }
+}
