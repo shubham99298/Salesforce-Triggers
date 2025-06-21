@@ -1,0 +1,58 @@
+Trigger Scenario
+• When an Account record is created then Create a
+related Opportunity as well.
+• Create Trigger on Account
+Create TriggerHandler Class
+o о Create Test Class for Code Coverage
+
+
+
+trigger AccountTrigger on Account (after insert) {
+    AccountTriggerHandler.createRelatedOpp(Trigger.new);
+}
+
+public class AccountTriggerHandler {
+    public static void createRelatedOpp(List<Account> accList) {
+        List<Opportunity> oppList = new List<Opportunity>();
+
+        for (Account acc : accList) {
+            Opportunity opp = new Opportunity();
+            opp.Name = acc.Name;
+            opp.StageName = 'Prospecting';
+            opp.CloseDate = System.today();
+            opp.AccountId = acc.Id;
+            oppList.add(opp);
+        }
+
+        if (!oppList.isEmpty()) {
+            insert oppList;
+        }
+    }
+}
+
+@isTest
+public class AccountTriggerHandlerTest {
+    
+    @isTest
+    public static void testAccountTrigger() {
+        List<Account> accList = new List<Account>();
+        
+        for (Integer i = 0; i < 5; i++) {
+            Account acc = new Account();
+            acc.Name = 'Test ' + i;
+            accList.add(acc);
+        }
+        
+        Test.startTest();
+        insert accList;
+        Test.stopTest();
+        
+        // Query all opportunities created by the trigger
+        List<Opportunity> oppList = [
+            SELECT Id FROM Opportunity WHERE AccountId IN :accList
+        ];
+        
+        // Assert that one opportunity was created for each account
+        System.assertEquals(5, oppList.size(), '5 opportunities should have been created');
+    }
+}
