@@ -29,34 +29,30 @@ Public Class OpportunityTriggerHandler{
 
 }
 
-
 @isTest
+public class OpportunityTriggerHandlerTest {
 
-Public class OpportunityTriggerHandler{
- @isTest
- public static UdpateDesc(){
-   
-   List<Opportunity>OppList= new List<Opportunity>();
-   
-    for(Integer i=0; i<=5; i++)
-	{
-	  Opportunity Opp= new Opportunity();
-	  Opp.name='Test'+i;
-	  Opp.stageName='Prospecting';
-	  Opp.closeDate=system.today();
-	  opp.amount=50000;
-	  OppList.add(Opp);
-	}
-	Test.StartTest();
-	Insert OppList;
-	Test.Stoptest();
-	
-	List<Opportunity>UpdateOpps=[select Id,Description from Opportunity where Id in=:OppList[0].Id];
-	
-	system.assertEquals('Hot Opportunity',UpdateOpps[0].description);
-	
- }
+    @isTest
+    public static void testUpdateDesc() {
+        List<Opportunity> oppList = new List<Opportunity>();
+
+        for (Integer i = 0; i < 5; i++) {
+            Opportunity opp = new Opportunity();
+            opp.Name = 'Test' + i;
+            opp.StageName = 'Prospecting';
+            opp.CloseDate = System.today();
+            opp.Amount = 200000; // This is within the 100000-500000 range
+            oppList.add(opp);
+        }
+
+        Test.startTest();
+        insert oppList;
+        Test.stopTest();
+
+        List<Opportunity> updatedOpps = [
+            SELECT Id, Description FROM Opportunity WHERE Id = :oppList[0].Id
+        ];
+
+        System.assertEquals('Hot Opportunity', updatedOpps[0].Description);
+    }
 }
-
-
-
