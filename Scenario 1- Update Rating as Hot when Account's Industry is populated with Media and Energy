@@ -33,26 +33,29 @@ Public class AccountTriggerHandler{
 Test Class:75% Coverage We need
 
 @isTest
-Public Class AccountTriggerHandlerTest
-{
-@isTest
-  public static void UpdateRating(List<Account>accList)
-  {
-    List<Account>accList= new List<Account>();
-	
-	for(Integer i=1; i<=5; i++)
-	{
-	 Account acc= new Account();
-	 acc.name='Test'+i;
-	 acc.Industry='Media';
-	 accList.add(acc);
-	}
-	Test.startTest();
-	Insert accList;
-	Test.stopTest();
-	
-	List<Account>UpdateAccList=[select id,Rating from Account where Id =:accList[0].Id];
-	
-	system.assertEquals('HOT',UpdateAccList[0].Rating);
-  }
+public class AccountTriggerHandlerTest {
+
+    @isTest
+    public static void testUpdateRating() {
+        List<Account> accList = new List<Account>();
+
+        for (Integer i = 1; i <= 5; i++) {
+            Account acc = new Account();
+            acc.Name = 'Test' + i;
+            acc.Industry = 'Media';  // or 'Energy' will also work
+            accList.add(acc);
+        }
+
+        Test.startTest();
+        insert accList;
+        Test.stopTest();
+
+        // Query back one of the inserted accounts to verify the rating
+        Account updatedAcc = [
+            SELECT Id, Rating FROM Account WHERE Id = :accList[0].Id
+        ];
+
+        System.assertEquals('HOT', updatedAcc.Rating);
+    }
 }
+
