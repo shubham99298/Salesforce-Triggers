@@ -50,7 +50,7 @@ Public class AccountTriggerHandler{
    Insert accList;
    Test.stopTest();
    
-   List<Account>UpdateAcc=[select id,ShippingCity from Account where Id=:UpdateAcc[0].Id];
+   List<Account>UpdateAcc=[select id,ShippingCity from Account where Id=:accList[0].Id];
    
    
    system.assertEquals('Jaipur',UpdateAcc[0].Billingcity);
