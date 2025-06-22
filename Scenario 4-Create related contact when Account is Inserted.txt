@@ -6,54 +6,52 @@ Create TriggerHandler Class
 Create Test Class for Code Coverage
 
 
-Trigger AccountTrigger on Account(After Insert)
-{
- AccountTriggerHandler.CreateRelatedContact(Trigger.new);
+trigger AccountTrigger on Account (after insert) {
+    AccountTriggerHandler.CreateRelatedContact(Trigger.new);
 }
 
-Public class AccountTriggerHandler{
- public static void CreateRelatedContact(List<Account>accList)
- {
-   List<contact>conList= new List<contact>();
-   for(Account acc:accList)
-   {
-     Contact con= new contact();
-	 con.LastName=acc.Name;
-	 con.accountId=acc.Id;
-	 conList.add(con);
-   }
-    if(!conList.isempty())
-	{
-	 Insert conList;
-	}
- }
+
+public class AccountTriggerHandler {
+    public static void CreateRelatedContact(List<Account> accList) {
+        List<Contact> conList = new List<Contact>();
+
+        for (Account acc : accList) {
+            Contact con = new Contact();
+            con.LastName = acc.Name; // Using Account Name as Contact's LastName
+            con.AccountId = acc.Id;
+            conList.add(con);
+        }
+
+        if (!conList.isEmpty()) {
+            insert conList;
+        }
+    }
 }
 
-Test Class
+
 @isTest
-public Class AccountTriggerHandler{
- @isTest 
- public static void CreateRelatedContact
- { 
-    List<Account>accList= new List<Account>();
-	
-	for(Integer i=0; i<=5; i++)
-	{
-	 Account acc= new Account();
-	 acc.name='test'+i;
-	 accList.add(acc);
-	 
-	}
-	Test.StartTest();
-	Insert accList;
-	Test.Stoptest();
-	
-	
-	List<contact>conList= [select id from contact where AccountId =:accList[0].Id];'
-	
-	system.asserEquals(ConList!=NULL , 'contact is created');
-	//system.assertEquals(6,conList.size());
-	
-	
- }
+public class AccountTriggerHandlerTest {
+
+    @isTest 
+    public static void testCreateRelatedContact() { 
+        List<Account> accList = new List<Account>();
+
+        for (Integer i = 0; i < 5; i++) {
+            Account acc = new Account();
+            acc.Name = 'Test' + i;
+            accList.add(acc);
+        }
+
+        Test.startTest();
+        insert accList;
+        Test.stopTest();
+
+        // Query the contacts related to inserted accounts
+        List<Contact> conList = [
+            SELECT Id, AccountId FROM Contact WHERE AccountId IN :accList
+        ];
+
+        // Assert that 5 contacts were created (one for each account)
+        System.assertEquals(5, conList.size(), 'Each Account should have one related Contact.');
+    }
 }
