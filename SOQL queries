@@ -1,0 +1,77 @@
+✅ 1. Fetch all contact records whose account name starts with “S”.
+
+SELECT Id, LastName 
+FROM Contact 
+WHERE Account.Name LIKE 'S%'
+
+
+✅ 2. Fetch all accounts where the modified date is today.
+
+SELECT Id, Name 
+FROM Account 
+WHERE LastModifiedDate = TODAY
+
+
+✅ 3. Fetch all Opportunities Name, StageName, and Amount where CloseDate is equal to this month.
+SELECT Name, StageName, Amount 
+FROM Opportunity 
+WHERE CloseDate = THIS_MONTH
+
+
+✅ 4. Fetch the total amount for each stage in the Opportunities.
+SELECT StageName, SUM(Amount) 
+FROM Opportunity 
+GROUP BY StageName
+
+✅5. Fetch all accounts that have at least one opportunity record.
+
+SELECT Id, Name 
+FROM Account 
+WHERE Id IN (SELECT AccountId FROM Opportunity)
+
+✅ 6. Get all the account records where the CloseDate of Opportunity records should be for the fiscal year, and accounts should be owned by the currently logged-in user.
+
+SELECT Id, Name 
+FROM Account 
+WHERE Id IN (
+    SELECT AccountId 
+    FROM Opportunity 
+    WHERE CloseDate = THIS_FISCAL_YEAR
+)
+AND OwnerId = :User.Id
+
+
+✅ 7. Fetch the number of accounts in each billing state and industry base.
+
+SELECT BillingState, Industry, COUNT(Id) 
+FROM Account 
+GROUP BY BillingState, Industry
+
+✅ 8. Fetch only those opportunity records whose CloseDate is next month.sql
+SELECT Id, Name 
+FROM Opportunity 
+WHERE CloseDate = NEXT_MONTH
+
+✅ 9. Fetch all opportunity line-item records that have a minimum amount.
+SELECT Id, TotalPrice 
+FROM OpportunityLineItem 
+ORDER BY TotalPrice ASC 
+LIMIT 1
+
+✅ 10. Fetch only those opportunities whose Stage is Won, Unassigned, or Closed Lost.
+SELECT Id, Name, StageName 
+FROM Opportunity 
+WHERE StageName IN ('Won', 'Unassigned', 'Closed Lost')
+
+✅ 11. Fetch only those account records which are created in this month.
+
+SELECT Id, Name 
+FROM Account 
+WHERE CreatedDate = THIS_MONTH
+
+
+✅ 12. Fetch only those product records which contain product code “ASN123” or “ASN987” and product family is Hardware.
+SELECT Id, Name, ProductCode 
+FROM Product2 
+WHERE (ProductCode = 'ASN123' OR ProductCode = 'ASN987') 
+AND Family = 'Hardware'
