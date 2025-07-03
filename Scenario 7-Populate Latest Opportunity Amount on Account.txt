@@ -1,0 +1,68 @@
+Trigger Scenario
+When an Opportunity is created on any Account, put
+the latest opportunity Amount on the Account in the
+'Latest Opportunity Amount' field.
+о Create Trigger on Opportunity
+О Create TriggerHandler Class
+O Create Test Class for Code Coverage
+
+
+trigger OpportunityTrigger on Opportunity (after insert) {
+    OpportunityTriggerHandler.UpdateRelatedAccount(Trigger.new);
+}
+
+public class OpportunityTriggerHandler {
+    public static void UpdateRelatedAccount(List<Opportunity> oppList) {
+        List<Account> accList = new List<Account>();
+
+        for (Opportunity opp : oppList) {
+            if (opp.AccountId != null && opp.Amount != null) {
+                Account acc = new Account();
+                acc.Id = opp.AccountId;
+                acc.Latest_Opp_Amount__c = opp.Amount;  // Ensure this is the correct API name
+                accList.add(acc);
+            }
+        }
+
+        if (!accList.isEmpty()) {
+            update accList;
+        }
+    }
+}
+
+@isTest
+public class OpportunityTriggerHandlerTes {
+    @isTest
+    public static void UpdateRelatedaccount() {
+        List<Account> accList = new List<Account>();
+
+        for (Integer i = 0; i < 5; i++) {
+            Account acc = new Account();
+            acc.Name = 'test' + i;
+            accList.add(acc);
+        }
+        insert accList;
+
+        List<Opportunity> oppList = new List<Opportunity>();
+
+        for (Account acc : accList) {
+            Opportunity opp = new Opportunity();
+            opp.Name = 'Opp for ' + acc.Name;
+            opp.StageName = 'Prospecting'; // Fixed typo from 'propsecting'
+            opp.CloseDate = Date.today().addDays(10);
+            opp.Amount = 5000;
+            opp.AccountId = acc.Id;
+            oppList.add(opp);
+        }
+
+        Test.startTest();
+        insert oppList;
+        Test.stopTest();
+
+        // Check only for the first Account and its Opportunity
+        Account updatedAcc = [SELECT Id, Latest_Opp_Amount__c FROM Account WHERE Id = :accList[0].Id];
+        Opportunity insertedOpp = [SELECT Id, Amount FROM Opportunity WHERE AccountId = :accList[0].Id LIMIT 1];
+
+        System.assertEquals(updatedAcc.Latest_Opp_Amount__c, insertedOpp.Amount);
+    }
+}
