@@ -1,0 +1,86 @@
+Trigger Scenario with Test Class
+On Account two checkbox fields are available:
+。 New Contact and New Opportunity
+On Account Creation
+。 if New Contact checkbox is checked then a related
+Contact should be created.
+。 If New Opportunity checkbox is checked and
+Active = Yes, then a related Opportunity should be
+created.
+
+
+trigger AccountTrigger on Account (after insert) {
+    AccountTriggerHandler.CreateRelatedConorOpp(Trigger.new);
+}
+
+public class AccountTriggerHandler {
+
+    public static void CreateRelatedConorOpp(List<Account> accList) {
+        List<Contact> conList = new List<Contact>();
+        List<Opportunity> oppList = new List<Opportunity>();
+
+        for (Account acc : accList) {
+            if (acc.New_Contact__c) {
+                Contact con = new Contact();
+                con.LastName = acc.Name;
+                con.AccountId = acc.Id;
+                conList.add(con);
+            }
+
+            if (acc.New_Opportunity__c && acc.Active__c == 'Yes') {
+                Opportunity opp = new Opportunity();
+                opp.Name = acc.Name;
+                opp.StageName = 'Prospecting';
+                opp.CloseDate = Date.today().addDays(30);
+                opp.AccountId = acc.Id;
+                oppList.add(opp);
+            }
+        }
+
+        if (!conList.isEmpty()) {
+            insert conList;
+        }
+
+        if (!oppList.isEmpty()) {
+            insert oppList;
+        }
+    }
+}
+
+@isTest
+
+@isTest
+public class AccountTriggerHandlerTest {
+
+    @isTest
+    public static void createRelatedConOrOppTest() {
+        List<Account> accList = new List<Account>();
+
+        for (Integer i = 0; i < 5; i++) {
+            Account acc = new Account();
+            acc.Name = 'Test Account ' + i;
+            acc.New_Contact__c = true;
+            acc.New_Opportunity__c = true;
+            acc.Active__c = 'Yes'; // Required for Opportunity creation
+            accList.add(acc);
+        }
+
+        Test.startTest();
+        insert accList;
+        Test.stopTest();
+
+        // Assert 5 Contacts created
+        List<Contact> conList = [
+            SELECT Id FROM Contact 
+            WHERE AccountId IN :accList
+        ];
+        System.assertEquals(5, conList.size(), 'Expected 5 Contacts');
+
+        // Assert 5 Opportunities created
+        List<Opportunity> oppList = [
+            SELECT Id FROM Opportunity 
+            WHERE AccountId IN :accList
+        ];
+        System.assertEquals(5, oppList.size(), 'Expected 5 Opportunities');
+    }
+}
