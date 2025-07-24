@@ -1,0 +1,59 @@
+Async Apex
+
+It will Run when The Resources will be available
+This method is independent
+
+Future Method-->When it will get resource , then it will run in  separate Thread!!
+----->used for web service callout
+
+FUTURE METHOD: I
+1. Future method runs asynchronously
+2. Future method runs in separate thread means it does not depend on any other method to get processed.
+3. Future method is used to callout webservices
+4. Future method is used to avoid Mixed DML Exception (Imp topic)
+5.Future method works only with static Method
+
+
+Questions:
+1. Can we call one future method from another future method?
+Ans: You can not call one future method from another future method.2. Can we call future method from void or non static method?
+Ans: Yes, We can call future method from void or non static as well as from static methods.
+3. How to call web services from Future method?
+Ans :Yes we can call web services by setting callout=true
+4. Future method supports to which data types?
+Ans: Future method supports to Primitive Data types only and we can not pass objects or SObject as a Parameter to Future method
+
+
+public class FutureMethodExp {
+       
+    public FutureMethodExp(){
+        Method1();
+        Method2();
+        Method3();
+        Method4(5,'Shubham');
+        Method5();
+    }
+    Public void Method1(){
+        
+        system.debug('First Method');
+    }
+    Public void Method2(){
+        
+        system.debug('second Method');
+    }
+    @Future
+    Public static void Method3(){
+        
+        system.debug('third Method');
+          //Method4();-->cannot call future method from future method
+    }
+    @future
+    Public static void Method4(Integer i, String s){
+        
+        system.debug('fourth Method');
+    }
+    Public static void Method5(){
+        
+        system.debug('fifth Method');
+    }
+}

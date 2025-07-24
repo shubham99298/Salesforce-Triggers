@@ -1,0 +1,18 @@
+Queueable Interface: Asynchronous Apex
+1. future method:
+a. It does not return any job Id. (eg. Bank transaction id)
+b. You can not call one future method from another future method, job chaining is not possible
+c. In future method there is specified annotation used to identify future method, but in Queuable no need to use any
+specified annotation
+d. You can not also query the job status in future method
+e. Future method supports primitive data types but does not support objects/sobjects.
+2. Queuable Interface:
+b. It also runs its process in background like future method, whenever resources gets available
+c. It returns the job Id thru which we can get to know the job status whether it is completed or fail
+d. We can check that job id using apex jobs or by using SOQL
+e.We can perfrom job chainining, it means we can call one queuable class from another queuable.
+f. In Queuable it supports primitive and non primitive data types
+h. Queable interface has higher limits.
+
+
+AsyncApexJob jobInfo = [Select status, NumberOfErrors From AsyncApexJob Where Id = : jobld]

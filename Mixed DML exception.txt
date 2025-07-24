@@ -1,0 +1,46 @@
+MIXED DML EXCEPTION: Whenever we perform DML on Setup and Non-setup objects in one transaction, in that case we encounter with
+Mixed DML Exception.
+This exception occurs because of DML - INSERT, UPDATE, DELETE, UNDELETE
+DML: Whenever we have to insert, update, delete or undelete any records on the specified object, we need perfom DML.
+SETUP Object: Profile,user,groups,queues,permission set
+Non Setup Object: Standard object (Account,contact,oppportunity so on..) and custom object (Hotel, Hotel Staff, Room..)
+1. How to avoid Mixed DML Exception?
+Ans:Mixed DML Operation can be avoided by using future method, call one of the
+DML operation from future method
+
+public class MixedDMLExceptionMethod {
+
+    public static void dmlonSetupAndNonSetupObject(){
+          
+        //Insert account record here
+        Account a= new Account();
+        a.name='Salesforce Gyaan';
+        Insert a;
+        system.debug('record inserted');  //Non setup object Insertion
+        
+        Createuserrecord();
+        
+        
+    }
+    @future
+    public static void Createuserrecord(){
+        Profile p= [select Id from Profile where Name='Standard User'];  
+        UserRole r=[select Id from UserRole where Name='Channel Sales Team'];
+        //Creating a user here
+        
+        User createUser= new User();
+        createUser.alias='u11';
+        createUser.email='test@gmail.com';
+        createUser.EmailEncodingKey='UTF-8';
+        createUser.lastname='1name1';
+        createUser.languagelocalekey= 'en_US';
+        createUser.localesidkey= 'en_US'; 
+        Createuser.profileid = p.Id;
+        Createuser.userroleid = r.Id;
+        createUser.timezonesidkey='America/Los_Angeles';
+        createUser.username= 'uname12@hmail.com';
+        
+        Insert createUser;
+        
+    }
+}
