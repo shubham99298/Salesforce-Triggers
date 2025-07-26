@@ -1,0 +1,84 @@
+trigger ContactTrigger on Contact( after insert, after update, after delete, after undelete ) {
+
+    if( Trigger.isAfter ) {
+
+        if( Trigger.isInsert ) {
+
+            ContactTriggerHandler.UpdateRelatedAccount( trigger.new, null );
+
+        }
+
+        else if( Trigger.isUpdate) {
+
+            ContactTriggerHandler.UpdateRelatedAccount( trigger.new, trigger.oldMap );
+
+        }
+
+        else if( Trigger.isUndelete) {
+
+            ContactTriggerHandler.UpdateRelatedAccount( trigger.new, null );
+
+        }
+
+        else if( Trigger.isDelete ) {
+
+            ContactTriggerHandler.UpdateRelatedAccount( trigger.old, null );
+
+        }
+
+    }
+
+}
+public class ContactTriggerHandler
+{
+    public static void UpdateRelatedAccount(List<Contact> conList, Map<Id, Contact> OldConMap)
+    {
+        // Insert, delete or undelete
+        Set<Id> AccIds = new Set<Id>();
+
+        if(OldConMap == null || OldConMap.isEmpty())
+        {
+            for(Contact con : conList)
+            {
+                if(con.AccountId != null)
+                {
+                    AccIds.add(con.AccountId);
+                }
+            }
+        }
+
+        // Update
+        if(OldConMap != null && !OldConMap.isEmpty())
+        {
+            for(Contact con : conList)
+            {
+                if(con.AccountId != OldConMap.get(con.Id).AccountId)
+                {
+                    if(OldConMap.get(con.Id).AccountId != null)
+                    {
+                        AccIds.add(OldConMap.get(con.Id).AccountId);
+                    }
+                    if(con.AccountId != null)
+                    {
+                        AccIds.add(con.AccountId);
+                    }
+                }
+            }
+        }
+
+        if(!AccIds.isEmpty())
+        {
+            List<Account> accList = [SELECT Id, (SELECT Id FROM Contacts) FROM Account WHERE Id IN :AccIds];
+
+            for(Account acc : accList)
+            {
+                acc.Number_Of_Contacts__c = acc.Contacts.size();
+            }
+
+            if(!accList.isEmpty())
+            {
+                update accList;
+            }
+        }
+    }
+}
