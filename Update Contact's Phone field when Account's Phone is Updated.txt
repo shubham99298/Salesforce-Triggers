@@ -1,0 +1,42 @@
+Company wise Scenarios of trigger:
+
+
+• Whenever Account's Phone field is updated
+then all related Contact's phone field should
+also get updated with Parent Account's
+Phone.
+
+
+public class AccountTriggerHandler {
+
+    public static void updateRelatedConPhone(List<Account> accList, Map<Id, Account> accOldMap) {
+        Set<Id> accountIdsToUpdate = new Set<Id>();
+
+        for (Account acc : accList) {
+            if (acc.Phone != accOldMap.get(acc.Id).Phone) {
+                accountIdsToUpdate.add(acc.Id);
+            }
+        }
+
+        if (!accountIdsToUpdate.isEmpty()) {
+            List<Contact> contactsToUpdate = new List<Contact>();
+
+            List<Account> accountsWithContacts = [
+                SELECT Id, Phone, (SELECT Id, Phone FROM Contacts)
+                FROM Account
+                WHERE Id IN :accountIdsToUpdate
+            ];
+
+            for (Account acc : accountsWithContacts) {
+                for (Contact con : acc.Contacts) {
+                    con.Phone = acc.Phone;
+                    contactsToUpdate.add(con);
+                }
+            }
+
+            if (!contactsToUpdate.isEmpty()) {
+                update contactsToUpdate;
+            }
+        }
+    }
+}
